@@ -59,7 +59,7 @@ export default function GameRoom() {
         router.push('/');
       }
     }
-  }, [gameState, playerName, router, roomCode]);
+  }, [gameState, playerName, router, roomCode, error]);
 
   // Auto-clear error after 4 seconds
   useEffect(() => {

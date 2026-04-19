@@ -95,10 +95,10 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
                 <div className="inline-block px-4 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-xs uppercase tracking-widest mb-4">
                   The Objective
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Don't Get Blown Up!</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">Don&apos;t Get Blown Up!</h3>
                 <p className="text-slate-400 leading-relaxed">
                   The deck contains a few **Kaboom Kitties**. Players take turns playing cards and then **drawing** from the deck. 
-                  If you draw a Kaboom, you're out. The last player left alive wins!
+                  If you draw a Kaboom, you&apos;re out. The last player left alive wins!
                 </p>
               </section>
 
@@ -129,7 +129,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               {/* Footer Note */}
               <section className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 text-center">
                 <p className="text-slate-300 font-medium italic">
-                  "It's like Russian Roulette, but with explosive kittens and tactical laser pointers."
+                  &quot;It&apos;s like Russian Roulette, but with explosive kittens and tactical laser pointers.&quot;
                 </p>
               </section>
             </div>

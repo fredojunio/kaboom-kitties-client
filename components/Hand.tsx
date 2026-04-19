@@ -11,7 +11,7 @@ export function Hand() {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [isSelectingTarget, setIsSelectingTarget] = useState(false);
   const [isSelectingCardType, setIsSelectingCardType] = useState(false);
-  const [pendingPlay, setPendingPlay] = useState<{ type: 'single' | 'combo', cardIds: string[], namedCard?: any } | null>(null);
+  const [pendingPlay, setPendingPlay] = useState<{ type: 'single' | 'combo', cardIds: string[], namedCard?: string } | null>(null);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   // Responsive sizes
@@ -61,7 +61,7 @@ export function Hand() {
       playCard(pendingPlay.cardIds[0], targetPlayerId);
     } else {
       // If it's a 3-of-a-kind combo, it might have a namedCard attached
-      playCombo(pendingPlay.cardIds, targetPlayerId, pendingPlay.namedCard as any);
+      playCombo(pendingPlay.cardIds, targetPlayerId, pendingPlay.namedCard as string);
     }
 
     setIsSelectingTarget(false);
@@ -169,7 +169,7 @@ export function Hand() {
               className="bg-slate-900 border border-slate-700 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-4xl text-center"
             >
               <h3 className="text-3xl font-black mb-2 uppercase tracking-tight text-white italic">What do you want?</h3>
-              <p className="text-slate-400 text-sm mb-8 font-medium italic">"Name your price, little kitty..."</p>
+              <p className="text-slate-400 text-sm mb-8 font-medium italic">&quot;Name your price, little kitty...&quot;</p>
               
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-h-[60vh] overflow-y-auto p-4 custom-scrollbar">
                 {Object.keys(cardAssets)

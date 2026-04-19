@@ -8,7 +8,6 @@ export function NopeButton() {
   if (!gameState || !gameState.pendingAction) return null;
 
   const action = gameState.pendingAction;
-  const isMyAction = action.originalPlayerId === socketId;
   const hasNope = gameState.myHand.some(c => c.type === 'nope');
   const canNope = hasNope; // Everyone can nope if they have the card
 
