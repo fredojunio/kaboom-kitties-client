@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
+import { CardType } from '../types';
 
 import Image from 'next/image';
 import { cardColors, cardEmojis, cardAssets } from '../lib/cardStyles';
@@ -11,7 +12,7 @@ export function Hand() {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [isSelectingTarget, setIsSelectingTarget] = useState(false);
   const [isSelectingCardType, setIsSelectingCardType] = useState(false);
-  const [pendingPlay, setPendingPlay] = useState<{ type: 'single' | 'combo', cardIds: string[], namedCard?: string } | null>(null);
+  const [pendingPlay, setPendingPlay] = useState<{ type: 'single' | 'combo', cardIds: string[], namedCard?: CardType } | null>(null);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   // Responsive sizes
@@ -61,7 +62,7 @@ export function Hand() {
       playCard(pendingPlay.cardIds[0], targetPlayerId);
     } else {
       // If it's a 3-of-a-kind combo, it might have a namedCard attached
-      playCombo(pendingPlay.cardIds, targetPlayerId, pendingPlay.namedCard as string);
+      playCombo(pendingPlay.cardIds, targetPlayerId, pendingPlay.namedCard);
     }
 
     setIsSelectingTarget(false);
@@ -178,7 +179,7 @@ export function Hand() {
                     <button
                       key={type}
                       onClick={() => {
-                        setPendingPlay(prev => prev ? { ...prev, namedCard: type } : null);
+                        setPendingPlay(prev => prev ? { ...prev, namedCard: type as CardType } : null);
                         setIsSelectingCardType(false);
                         setIsSelectingTarget(true);
                       }}
