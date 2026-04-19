@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 
 export function NopeButton() {
-  const { gameState, playNope, socketId } = useGameStore();
+  const { gameState, playNope } = useGameStore();
 
   if (!gameState || !gameState.pendingAction) return null;
 
