@@ -31,13 +31,13 @@ export default function GameRoom() {
       setShowTurnPopup(prev => {
         if (!prev) {
           // It was false, now it's my turn, show it!
-          const timer = setTimeout(() => setShowTurnPopup(false), 2000);
+          setTimeout(() => setShowTurnPopup(false), 2000);
           return true;
         }
         return prev;
       });
     }
-  }, [gameState?.currentPlayerId, gameState?.status]);
+  }, [gameState]);
 
   useEffect(() => {
     // If we have no playerName and no gameState, it means we probably refreshed the page
