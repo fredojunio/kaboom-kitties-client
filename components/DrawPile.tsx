@@ -40,7 +40,10 @@ export function DrawPile() {
       </motion.button>
 
       {isMyTurn && (
-        <div className="text-green-400 font-bold animate-pulse text-sm uppercase tracking-tighter">Your Turn - Draw a card</div>
+        <div className="text-white font-black animate-pulse text-[10px] md:text-xs uppercase tracking-[0.2em] flex flex-col items-center">
+          <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent italic">Your Turn</span>
+          <span className="text-white font-bold tracking-widest mt-0.5">Draw a card</span>
+        </div>
       )}
     </div>
   );

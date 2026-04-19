@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
+import { RulesModal } from '../components/RulesModal';
 
 export default function Home() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [roomCodeInput, setRoomCodeInput] = useState('');
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
   const { connect, currentRoomCode } = useGameStore();
 
   useEffect(() => {
@@ -114,9 +116,20 @@ export default function Home() {
                 Join
               </motion.button>
             </form>
+
+            <div className="pt-2">
+              <button 
+                onClick={() => setIsRulesOpen(true)}
+                className="w-full text-slate-500 hover:text-white text-sm font-bold uppercase tracking-widest py-2 transition-colors flex items-center justify-center gap-2"
+              >
+                <span>❔ How to Play</span>
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>
+
+      <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
     </main>
   );
 }

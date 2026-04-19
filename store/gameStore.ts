@@ -22,12 +22,14 @@ interface GameStateStore {
   playCombo: (cardIds: string[], targetPlayerId: string, namedCard?: CardType) => void;
   playNope: (pendingActionId: string, cardId: string) => void;
   drawCard: () => void;
+  giveFavor: (cardId: string) => void;
   insertDefuse: (index: number) => void;
   reorderHand: (newOrder: string[]) => void;
   clearError: () => void;
   clearPeeked: () => void;
   tryReconnect: (roomCode: string, playerId: string) => void;
   kickPlayer: (targetPlayerId: string) => void;
+  leaveRoom: () => void;
 }
 
 export const useGameStore = create<GameStateStore>((set, get) => {
@@ -178,6 +180,13 @@ export const useGameStore = create<GameStateStore>((set, get) => {
       }
     },
 
+    giveFavor: (cardId) => {
+      const state = get().gameState;
+      if (state) {
+        socket.emit('give_favor', { roomCode: state.roomCode, cardId });
+      }
+    },
+
     insertDefuse: (index) => {
       const state = get().gameState;
       const card = get().awaitingDefuseCard;
@@ -211,5 +220,10 @@ export const useGameStore = create<GameStateStore>((set, get) => {
         socket.emit('kick_player', { roomCode: state.roomCode, targetPlayerId });
       }
     },
+    
+    leaveRoom: () => {
+      sessionStorage.removeItem('kaboom_session');
+      set({ gameState: null, currentRoomCode: null, awaitingDefuseCard: null, kaboomDrawnId: null });
+    }
   };
 });

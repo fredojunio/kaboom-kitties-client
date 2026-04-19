@@ -47,18 +47,18 @@ export const cardEmojis: Record<string, string> = {
 };
 
 export const cardAssets: Record<string, StaticImageData> = {
-  attack,
-  beard_cat,
-  cattermelon,
-  defuse,
-  demand,
-  hairy_potato_cat,
   kaboom,
+  defuse,
+  attack,
+  skip,
+  demand,
   nope,
   peek,
-  rainbow_ralphing_cat,
   shuffle,
-  skip,
+  hairy_potato_cat,
+  rainbow_ralphing_cat,
+  cattermelon,
   taco_cat,
+  beard_cat,
   back,
 };

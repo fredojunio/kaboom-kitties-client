@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useGameStore } from '../../../store/gameStore';
 import { PlayerList } from '../../../components/PlayerList';
@@ -17,25 +17,22 @@ export default function GameRoom() {
   const roomCode = params.roomCode as string;
   const router = useRouter();
 
-  const { gameState, playerName, startGame } = useGameStore();
+  const { gameState, playerName, startGame, leaveRoom, error } = useGameStore();
   const [showTurnPopup, setShowTurnPopup] = useState(false);
+  const lastNotifiedId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!gameState) return;
     const myId = useGameStore.getState().socketId;
-    
-    // Only trigger if the turn has actually shifted to the player
-    if (gameState.currentPlayerId === myId && gameState.status === 'playing') {
-      // We don't want it to re-popup if we are just updating the same turn
-      // Simple way: only set to true if it's currently false
-      setShowTurnPopup(prev => {
-        if (!prev) {
-          // It was false, now it's my turn, show it!
-          setTimeout(() => setShowTurnPopup(false), 2000);
-          return true;
-        }
-        return prev;
-      });
+
+    // Only trigger if the turn has actually shifted TO the player
+    if (gameState.status === 'playing') {
+      if (gameState.currentPlayerId === myId && lastNotifiedId.current !== myId) {
+        setShowTurnPopup(true);
+        setTimeout(() => setShowTurnPopup(false), 2000);
+      }
+      // Update the tracker
+      lastNotifiedId.current = gameState.currentPlayerId;
     }
   }, [gameState]);
 
@@ -55,11 +52,26 @@ export default function GameRoom() {
       } catch (e) {
         console.error('Failed to parse session', e);
       }
-      
+
       // If no valid session was found, send back to home
-      router.push('/');
+      // Only redirect if there's no error (if there's an error, we want to show it)
+      if (!error) {
+        router.push('/');
+      }
     }
   }, [gameState, playerName, router, roomCode]);
+
+  // Auto-clear error after 4 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        useGameStore.getState().clearError();
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+
 
   if (!gameState) {
     return (
@@ -91,7 +103,7 @@ export default function GameRoom() {
                   <span className="font-bold text-lg">{p.name} {p.isMe && '(You)'}</span>
                 </div>
                 {isHost && !p.isMe && (
-                  <button 
+                  <button
                     onClick={() => useGameStore.getState().kickPlayer(p.id)}
                     className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 opacity-60 hover:opacity-100 transition-all flex items-center gap-1 text-sm font-bold"
                   >
@@ -136,7 +148,13 @@ export default function GameRoom() {
           <h1 className="text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-600">
             {winner?.name} Wins!
           </h1>
-          <button onClick={() => router.push('/')} className="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-xl transition-colors">
+          <button
+            onClick={() => {
+              leaveRoom();
+              router.push('/');
+            }}
+            className="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-xl transition-colors"
+          >
             Play Again
           </button>
         </motion.div>
@@ -146,6 +164,29 @@ export default function GameRoom() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-950 text-white">
+      {/* Toast Error Notification */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            className="fixed top-0 left-1/2 -translate-x-1/2 z-[2000] w-full max-w-sm px-4"
+          >
+            <div className="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-2 border-white/20">
+              <span className="text-2xl">⚠️</span>
+              <p className="font-bold text-sm">{error}</p>
+              <button
+                onClick={() => useGameStore.getState().clearError()}
+                className="ml-auto bg-black/20 hover:bg-black/40 w-6 h-6 rounded-full flex items-center justify-center text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background Asset */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <Image

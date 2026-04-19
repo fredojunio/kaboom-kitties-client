@@ -9,7 +9,8 @@ export function NopeButton() {
 
   const action = gameState.pendingAction;
   const isMyAction = action.originalPlayerId === socketId;
-  const hasNope = gameState.myHand.some(c => c.type === 'nope') && !isMyAction;
+  const hasNope = gameState.myHand.some(c => c.type === 'nope');
+  const canNope = hasNope; // Everyone can nope if they have the card
 
   const handleNope = () => {
     const nopeCard = gameState.myHand.find(c => c.type === 'nope');
@@ -18,19 +19,33 @@ export function NopeButton() {
     }
   };
 
-  const actionName = action.actionType.replace('_', ' ');
+  const actionName = action.actionType.replace('play_', '').replace('_', ' ');
   const originalPlayer = gameState.players.find(p => p.id === action.originalPlayerId)?.name || 'Someone';
-  const nopeMessage = action.nopeCount > 0 ? `Action Noped ${action.nopeCount} times!` : `${originalPlayer} is about to ${actionName}`;
+
+  const isCurrentlyCancelled = action.nopeCount % 2 !== 0;
+  const nopeMessage = action.nopeCount > 0
+    ? (isCurrentlyCancelled ? "ACTION NOPED!" : "ACTION YEPPED!")
+    : `${originalPlayer} is playing ${actionName}`;
 
   if (!hasNope && !action.nopeCount) {
     return (
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none z-50">
-        <motion.div 
+      <div className="absolute top-4 md:top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-50 w-full px-4">
+        <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-black/80 text-white px-6 py-3 rounded-xl border border-slate-700 backdrop-blur-md"
+          className="bg-black/90 text-white px-8 py-4 rounded-3xl border-2 border-slate-700 backdrop-blur-xl shadow-2xl text-center"
         >
-          <div className="animate-pulse">{nopeMessage} (2s window)</div>
+          <div className="text-sm font-black uppercase tracking-tighter text-slate-400 mb-1">{actionName}</div>
+          <div className="font-black text-xl uppercase italic underline decoration-yellow-500">{nopeMessage}</div>
+          <div className="mt-4 h-1.5 w-32 bg-slate-800 rounded-full overflow-hidden">
+            <motion.div
+              key={action.nopeCount}
+              initial={{ width: '100%' }}
+              animate={{ width: '0%' }}
+              transition={{ duration: 5, ease: "linear" }}
+              className="h-full bg-yellow-500"
+            />
+          </div>
         </motion.div>
       </div>
     );
@@ -38,38 +53,54 @@ export function NopeButton() {
 
   return (
     <AnimatePresence>
-      <motion.div 
-        initial={{ scale: 0, opacity: 0, y: 50 }}
+      <motion.div
+        initial={{ scale: 0, opacity: 0, y: -50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0, opacity: 0 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col items-center group"
+        className="absolute top-4 md:top-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center group w-full"
       >
         <div className="bg-black/60 px-4 py-2 rounded-t-xl text-white font-mono text-sm">
           {nopeMessage}
         </div>
         <motion.button
-          whileHover={{ scale: 1.1, rotate: [-2, 2, -2, 0] }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={handleNope}
-          disabled={!hasNope}
-          className={`w-24 h-24 md:w-32 md:h-32 rounded-full font-black text-2xl md:text-4xl border-4 md:border-8 shadow-2xl flex items-center justify-center transition-colors ${
-            hasNope 
-              ? 'bg-red-600 border-red-800 text-white shadow-red-500/50 cursor-pointer hover:bg-red-500 hover:border-red-600'
-              : 'bg-slate-700 border-slate-900 text-slate-500 cursor-not-allowed opacity-50'
-          }`}
+          disabled={!canNope}
+          className={`w-32 h-32 md:w-44 md:h-44 rounded-full font-black text-3xl md:text-5xl border-8 md:border-[12px] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex items-center justify-center transition-all duration-300 relative overflow-hidden ${canNope
+            ? 'bg-red-600 border-red-950 text-white shadow-red-500/50 cursor-pointer hover:bg-red-500 hover:scale-105 active:scale-95'
+            : 'bg-slate-800 border-slate-900 text-slate-600 cursor-not-allowed opacity-40'
+            }`}
         >
-          NOPE!
+          <span className="z-10 tracking-tighter uppercase italic">{isCurrentlyCancelled ? 'YEP!' : 'NOPE!'}</span>
+
+          {/* Pulsing glow */}
+          {canNope && (
+            <div className="absolute inset-0 bg-white/20 animate-pulse pointer-events-none" />
+          )}
+
+          {/* Animated background rings */}
+          <div className="absolute inset-0 z-0">
+            <motion.div
+              key={action.nopeCount}
+              initial={{ width: '100%', height: '100%' }}
+              animate={{ width: '0%', height: '0%' }}
+              transition={{ duration: 5, ease: "linear" }}
+              className="absolute inset-0 m-auto bg-black/20 rounded-full"
+            />
+          </div>
         </motion.button>
 
-        {/* Timer ring indicator mock */}
-        <div className="absolute top-10 left-10 right-0 py-2 pointer-events-none">
-           <motion.div 
-             initial={{ width: '100%' }}
-             animate={{ width: '0%' }}
-             transition={{ duration: 2, ease: "linear" }}
-             className="h-2 bg-yellow-400 mt-20 z-0 origin-left"
-           />
-        </div>
+        {/* Tips */}
+        {canNope && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 text-white font-black text-xs uppercase tracking-widest bg-red-600/20 px-4 py-1 rounded-full border border-red-500/30 backdrop-blur-sm"
+          >
+            QUICK! COUNTER-PLAY ACTIVE
+          </motion.div>
+        )}
       </motion.div>
     </AnimatePresence>
   );
