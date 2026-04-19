@@ -23,12 +23,21 @@ export default function GameRoom() {
   useEffect(() => {
     if (!gameState) return;
     const myId = useGameStore.getState().socketId;
+    
+    // Only trigger if the turn has actually shifted to the player
     if (gameState.currentPlayerId === myId && gameState.status === 'playing') {
-      setShowTurnPopup(true);
-      const timer = setTimeout(() => setShowTurnPopup(false), 2000);
-      return () => clearTimeout(timer);
+      // We don't want it to re-popup if we are just updating the same turn
+      // Simple way: only set to true if it's currently false
+      setShowTurnPopup(prev => {
+        if (!prev) {
+          // It was false, now it's my turn, show it!
+          const timer = setTimeout(() => setShowTurnPopup(false), 2000);
+          return true;
+        }
+        return prev;
+      });
     }
-  }, [gameState]);
+  }, [gameState?.currentPlayerId, gameState?.status]);
 
   useEffect(() => {
     // If we have no playerName and no gameState, it means we probably refreshed the page
