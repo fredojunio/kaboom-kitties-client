@@ -11,6 +11,7 @@ interface GameStateStore {
   socketId: string | null;
   kaboomDrawnId: string | null;
   awaitingDefuseCard: Card | null;
+  lastDrawnPlayerId: string | null;
   localHandOrder: string[];
   
   // Actions
@@ -76,6 +77,11 @@ export const useGameStore = create<GameStateStore>((set, get) => {
     set({ awaitingDefuseCard: card });
   });
 
+  socket.on('card_drawn', ({ playerId }) => {
+    set({ lastDrawnPlayerId: playerId });
+    setTimeout(() => set({ lastDrawnPlayerId: null }), 1500);
+  });
+
   socket.on('defuse_inserted', () => {
     set({ awaitingDefuseCard: null, kaboomDrawnId: null });
   });
@@ -120,6 +126,7 @@ export const useGameStore = create<GameStateStore>((set, get) => {
     socketId: null,
     kaboomDrawnId: null,
     awaitingDefuseCard: null,
+    lastDrawnPlayerId: null,
     localHandOrder: [],
 
     setPlayerName: (name) => set({ playerName: name }),

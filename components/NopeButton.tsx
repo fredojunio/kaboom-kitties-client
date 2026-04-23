@@ -22,9 +22,11 @@ export function NopeButton() {
   const originalPlayer = gameState.players.find(p => p.id === action.originalPlayerId)?.name || 'Someone';
 
   const isCurrentlyCancelled = action.nopeCount % 2 !== 0;
+  const targetPlayer = gameState.players.find(p => p.id === action.targetPlayerId)?.name;
+  
   const nopeMessage = action.nopeCount > 0
     ? (isCurrentlyCancelled ? "ACTION NOPED!" : "ACTION YEPPED!")
-    : `${originalPlayer} is playing ${actionName}`;
+    : `${originalPlayer} is playing ${actionName}${targetPlayer ? ` on ${targetPlayer}` : ''}`;
 
   if (!hasNope && !action.nopeCount) {
     return (
@@ -41,7 +43,7 @@ export function NopeButton() {
               key={action.nopeCount}
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}
-              transition={{ duration: 5, ease: "linear" }}
+              transition={{ duration: 2, ease: "linear" }}
               className="h-full bg-yellow-500"
             />
           </div>
@@ -84,7 +86,7 @@ export function NopeButton() {
               key={action.nopeCount}
               initial={{ width: '100%', height: '100%' }}
               animate={{ width: '0%', height: '0%' }}
-              transition={{ duration: 5, ease: "linear" }}
+              transition={{ duration: 2, ease: "linear" }}
               className="absolute inset-0 m-auto bg-black/20 rounded-full"
             />
           </div>
