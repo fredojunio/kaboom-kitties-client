@@ -16,7 +16,6 @@ export function CardAnimations() {
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
     const itemHeight = 56; // h-14
-    const paddingTop = 96; // h-24
     const scrollTop = container.scrollTop;
 
     const index = Math.round(scrollTop / itemHeight);
