@@ -85,7 +85,7 @@ export default function GameRoom() {
           className="bg-slate-800/60 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl z-10 w-full max-w-md text-center"
         >
           <h1 className="text-3xl font-black mb-2">Join Room: <span className="text-red-500 tracking-widest">{roomCode}</span></h1>
-          <p className="text-slate-400 mb-8">You've been invited to play Kaboom Kitties!</p>
+          <p className="text-slate-400 mb-8">You&apos;ve been invited to play Kaboom Kitties!</p>
 
           <form onSubmit={(e) => {
             e.preventDefault();

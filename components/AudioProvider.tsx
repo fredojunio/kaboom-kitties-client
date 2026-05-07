@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export function AudioProvider() {
   const { gameState, kaboomDrawnId, lastDrawnPlayerId } = useGameStore();
@@ -11,6 +11,14 @@ export function AudioProvider() {
   const bgmRef = useRef<HTMLAudioElement | null>(null);
   const boomRef = useRef<HTMLAudioElement | null>(null);
   const drawRef = useRef<HTMLAudioElement | null>(null);
+
+  const statusRef = useRef(gameState?.status);
+  const mutedRef = useRef(isMuted);
+
+  useEffect(() => {
+    statusRef.current = gameState?.status;
+    mutedRef.current = isMuted;
+  }, [gameState?.status, isMuted]);
 
   useEffect(() => {
     // Audio files are served from public/assets/mp3/
@@ -32,7 +40,7 @@ export function AudioProvider() {
     const handleInteraction = () => {
       setHasInteracted(true);
       // Try to "unlock" audio by playing/pausing a silent moment
-      if (bgmRef.current && gameState?.status === 'playing' && !isMuted) {
+      if (bgmRef.current && statusRef.current === 'playing' && !mutedRef.current) {
         bgmRef.current.play().catch(() => {});
       }
       window.removeEventListener('click', handleInteraction);
@@ -50,7 +58,7 @@ export function AudioProvider() {
         bgmRef.current = null;
       }
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle BGM playback
   useEffect(() => {
