@@ -43,7 +43,7 @@ export function NopeButton() {
               key={action.nopeCount}
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}
-              transition={{ duration: 2, ease: "linear" }}
+              transition={{ duration: 3, ease: "linear" }}
               className="h-full bg-yellow-500"
             />
           </div>
@@ -86,7 +86,7 @@ export function NopeButton() {
               key={action.nopeCount}
               initial={{ width: '100%', height: '100%' }}
               animate={{ width: '0%', height: '0%' }}
-              transition={{ duration: 2, ease: "linear" }}
+              transition={{ duration: 3, ease: "linear" }}
               className="absolute inset-0 m-auto bg-black/20 rounded-full"
             />
           </div>

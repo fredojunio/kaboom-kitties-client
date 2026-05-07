@@ -38,7 +38,7 @@ export function Hand() {
     const card = gameState.myHand.find(c => c.id === cardId);
     if (!card) return;
 
-    if (card.type === 'demand') {
+    if (card.type === 'demand' || card.type === 'fate_switch') {
       setPendingPlay({ type: 'single', cardIds: [cardId] });
       setIsSelectingTarget(true);
       return;

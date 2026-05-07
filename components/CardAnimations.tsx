@@ -129,22 +129,66 @@ export function CardAnimations() {
                 >
                   <div className="h-[100px]" />
 
-                  {[...Array((gameState?.drawPileCount || 0) + 1)].map((_, i) => {
-                    const label = i === 0 ? "TOP OF DECK" : i === (gameState?.drawPileCount || 0) ? "BOTTOM OF DECK" : ``;
-                    const isActive = selectedIndex === i;
-                    return (
-                      <motion.button
-                        key={i}
-                        onClick={() => scrollToIndex(i)}
-                        className="w-full h-14 flex items-center justify-center snap-center shrink-0 group"
-                      >
-                        <div className={`flex flex-col items-center transition-all duration-300 ${isActive ? 'scale-125' : 'scale-90 opacity-40 group-hover:opacity-80'}`}>
-                          <span className={`text-[15px] font-black mb-0.5 tracking-widest ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>{i}</span>
-                          <span className={`text-xs uppercase tracking-tight ${isActive ? 'text-white' : 'text-slate-400'}`}>{label}</span>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
+                  {(() => {
+                    if (!gameState) return null;
+                    const activePlayers = gameState.players;
+                    let currIdx = activePlayers.findIndex(p => p.id === gameState.currentPlayerId);
+                    if (currIdx === -1) currIdx = 0;
+                    
+                    let turnsLeft = (gameState.turnsRemaining || 1) - 1;
+                    const drawers: string[] = [];
+                    const count = (gameState.drawPileCount || 0) + 1;
+
+                    // If the current player has no turns left, move to next player immediately for POS 0
+                    if (turnsLeft <= 0) {
+                      let nextIdx = (currIdx + 1) % activePlayers.length;
+                      while (activePlayers[nextIdx]?.isEliminated && nextIdx !== currIdx) {
+                        nextIdx = (nextIdx + 1) % activePlayers.length;
+                      }
+                      currIdx = nextIdx;
+                      turnsLeft = 1;
+                    }
+
+                    for (let j = 0; j < count; j++) {
+                      const p = activePlayers[currIdx];
+                      drawers.push(p ? (p.isMe ? 'YOU' : p.name) : 'UNKNOWN');
+
+                      if (turnsLeft > 1) {
+                        turnsLeft--;
+                      } else {
+                        let nextIdx = (currIdx + 1) % activePlayers.length;
+                        while (activePlayers[nextIdx]?.isEliminated && nextIdx !== currIdx) {
+                          nextIdx = (nextIdx + 1) % activePlayers.length;
+                        }
+                        currIdx = nextIdx;
+                        turnsLeft = 1;
+                      }
+                    }
+
+                    return [...Array(count)].map((_, i) => {
+                      const label = i === 0 ? "TOP" : i === (gameState?.drawPileCount || 0) ? "BOTTOM" : ``;
+                      const isActive = selectedIndex === i;
+                      const drawer = drawers[i];
+
+                      return (
+                        <motion.button
+                          key={i}
+                          onClick={() => scrollToIndex(i)}
+                          className="w-full h-14 flex items-center justify-between px-6 snap-center shrink-0 group"
+                        >
+                          <div className={`flex flex-col items-start transition-all duration-300 ${isActive ? 'scale-110' : 'scale-90 opacity-40'}`}>
+                            <span className={`text-xs font-black tracking-widest ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>POS {i}</span>
+                            <span className={`text-[10px] uppercase tracking-tight ${isActive ? 'text-white/60' : 'text-slate-600'}`}>{label}</span>
+                          </div>
+
+                          <div className={`flex flex-col items-end transition-all duration-300 ${isActive ? 'scale-110' : 'scale-90 opacity-40'}`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-slate-400' : 'text-slate-600'}`}>Draws it:</span>
+                            <span className={`text-sm font-black italic tracking-tighter ${isActive ? 'text-orange-400' : 'text-slate-400'}`}>{drawer}</span>
+                          </div>
+                        </motion.button>
+                      );
+                    });
+                  })()}
 
                   <div className="h-[100px]" />
                 </div>

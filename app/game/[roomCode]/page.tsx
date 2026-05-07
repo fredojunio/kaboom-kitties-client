@@ -10,15 +10,18 @@ import { NopeButton } from '../../../components/NopeButton';
 import { CardAnimations } from '../../../components/CardAnimations';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import tableBg from '../../../app/assets/background/table.png';
+import tableBg from '../../../app/assets/background/table2.png';
 
 export default function GameRoom() {
   const params = useParams();
   const roomCode = params.roomCode as string;
   const router = useRouter();
 
-  const { gameState, playerName, startGame, leaveRoom, error } = useGameStore();
+  const { gameState, playerName, startGame, leaveRoom, error, connect } = useGameStore();
   const [showTurnPopup, setShowTurnPopup] = useState(false);
+  const [showJoinPrompt, setShowJoinPrompt] = useState(false);
+  const [joinName, setJoinName] = useState('');
+  const [copied, setCopied] = useState(false);
   const lastNotifiedId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -53,10 +56,10 @@ export default function GameRoom() {
         console.error('Failed to parse session', e);
       }
 
-      // If no valid session was found, send back to home
-      // Only redirect if there's no error (if there's an error, we want to show it)
+      // If no valid session was found, prompt them to join the room
+      // Only show prompt if there's no error (if there's an error, we want to show it)
       if (!error) {
-        router.push('/');
+        setShowJoinPrompt(true);
       }
     }
   }, [gameState, playerName, router, roomCode, error]);
@@ -72,6 +75,52 @@ export default function GameRoom() {
   }, [error]);
 
 
+
+  if (showJoinPrompt && !gameState) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-950">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-slate-800/60 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl z-10 w-full max-w-md text-center"
+        >
+          <h1 className="text-3xl font-black mb-2">Join Room: <span className="text-red-500 tracking-widest">{roomCode}</span></h1>
+          <p className="text-slate-400 mb-8">You've been invited to play Kaboom Kitties!</p>
+
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (joinName.trim()) {
+              connect(joinName.trim(), roomCode.toUpperCase());
+              setShowJoinPrompt(false);
+            }
+          }}>
+            <div className="text-left mb-6">
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Display Name</label>
+              <input
+                type="text"
+                value={joinName}
+                onChange={e => setJoinName(e.target.value)}
+                className="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all font-medium"
+                placeholder="Enter your name..."
+                maxLength={12}
+                autoFocus
+              />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={!joinName.trim()}
+              className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Join Game
+            </motion.button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!gameState) {
     return (
@@ -93,6 +142,18 @@ export default function GameRoom() {
           className="bg-slate-800/60 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl z-10 w-full max-w-lg text-center"
         >
           <h1 className="text-3xl font-black mb-2">Room Code: <span className="text-red-500 tracking-widest">{roomCode}</span></h1>
+
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="mb-8 text-sm text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 mx-auto"
+          >
+            <span>{copied ? '✅ COPIED!' : '📋 COPY INVITE LINK'}</span>
+          </button>
+
           <p className="text-slate-400 mb-8">Waiting for players to join...</p>
 
           <div className="space-y-2 mb-8 text-left max-h-60 overflow-y-auto custom-scrollbar pr-2">
@@ -200,6 +261,22 @@ export default function GameRoom() {
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col p-2 md:p-8 max-w-7xl mx-auto h-screen overflow-hidden gap-2 md:gap-4">
+        {/* Floating Room Info / Copy Link */}
+        <div className="absolute top-4 right-4 z-[100] md:top-8 md:right-8 flex flex-col items-end gap-2">
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="bg-slate-800/80 hover:bg-slate-700 backdrop-blur-md border border-slate-700 px-4 py-2 rounded-xl transition-all shadow-lg group flex items-center gap-2"
+          >
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors">
+              {copied ? '✅ Link Copied!' : `📋 Room: ${roomCode}`}
+            </span>
+          </button>
+        </div>
+
         {/* Top Section */}
         <div className="flex flex-col md:grid md:grid-cols-4 gap-2 md:gap-4 flex-1 min-h-0">
 

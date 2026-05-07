@@ -50,6 +50,11 @@ const ruleItems = [
     description: 'Shuffle the Draw Pile until you feel lucky.',
   },
   {
+    type: 'fate_switch',
+    title: 'Fate Switch',
+    description: 'Swap your entire hand with an opponent of your choice.',
+  },
+  {
     type: 'taco_cat', // Just to have an icon, Taco Cat is a good rep
     title: 'Special Combos',
     description: 'You can play matching sets of ANY cards (not just Cat Cards): \n\n• Pair (2): Steal a RANDOM card from another player. \n• Trio (3): Name a card type and steal it if they have it!',

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { RulesModal } from '../components/RulesModal';
+import { NewCardAnnouncement } from '../components/NewCardAnnouncement';
 
 export default function Home() {
   const router = useRouter();
@@ -130,6 +131,7 @@ export default function Home() {
       </motion.div>
 
       <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
+      <NewCardAnnouncement />
     </main>
   );
 }

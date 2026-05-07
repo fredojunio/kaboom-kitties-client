@@ -12,6 +12,7 @@ import shuffle from '../app/assets/cards/shuffle.png';
 import skip from '../app/assets/cards/skip.png';
 import taco_cat from '../app/assets/cards/taco_cat.png';
 import back from '../app/assets/cards/back.png';
+import fate_switch from '../app/assets/cards/fateswitch.jpeg';
 import { StaticImageData } from 'next/image';
 
 export const cardColors: Record<string, string> = {
@@ -28,6 +29,7 @@ export const cardColors: Record<string, string> = {
   rainbow_ralphing_cat: 'bg-pink-400',
   defuse: 'bg-emerald-500',
   kaboom: 'bg-black',
+  fate_switch: 'bg-blue-600',
 };
 
 export const cardEmojis: Record<string, string> = {
@@ -44,6 +46,7 @@ export const cardEmojis: Record<string, string> = {
   rainbow_ralphing_cat: '🌈',
   defuse: '🛡️',
   kaboom: '💥',
+  fate_switch: '🔄',
 };
 
 export const cardAssets: Record<string, StaticImageData> = {
@@ -61,4 +64,5 @@ export const cardAssets: Record<string, StaticImageData> = {
   taco_cat,
   beard_cat,
   back,
+  fate_switch,
 };
