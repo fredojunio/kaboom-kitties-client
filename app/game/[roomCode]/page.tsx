@@ -6,8 +6,11 @@ import { PlayerList } from '../../../components/PlayerList';
 import { DrawPile } from '../../../components/DrawPile';
 import { DiscardPile } from '../../../components/DiscardPile';
 import { Hand } from '../../../components/Hand';
+import { SpectatorView } from '../../../components/SpectatorView';
 import { NopeButton } from '../../../components/NopeButton';
 import { CardAnimations } from '../../../components/CardAnimations';
+import { TurnTimer } from '../../../components/TurnTimer';
+import { ActionLog } from '../../../components/ActionLog';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import tableBg from '../../../app/assets/background/table2.png';
@@ -154,7 +157,12 @@ export default function GameRoom() {
             <span>{copied ? '✅ COPIED!' : '📋 COPY INVITE LINK'}</span>
           </button>
 
-          <p className="text-slate-400 mb-8">Waiting for players to join...</p>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <span className="text-slate-400 font-semibold uppercase tracking-wider text-xs md:text-sm">Players in Room</span>
+            <span className="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2 shadow-inner">
+              👥 {gameState.players.length} / 14
+            </span>
+          </div>
 
           <div className="space-y-2 mb-8 text-left max-h-60 overflow-y-auto custom-scrollbar pr-2">
             {gameState.players.map(p => (
@@ -287,6 +295,7 @@ export default function GameRoom() {
 
           {/* Center Table (Flex 1 to take remaining space on mobile) */}
           <div className="md:col-span-2 flex flex-col items-center justify-center relative flex-1 p-2 md:p-4 min-h-0">
+            <TurnTimer />
             <div className="flex flex-row items-center justify-center gap-4 md:gap-12 w-full">
               <DrawPile />
               <DiscardPile />
@@ -295,12 +304,18 @@ export default function GameRoom() {
           </div>
 
           {/* Right Col: Placeholder or Log */}
-          <div className="hidden md:block md:col-span-1"></div>
+          <div className="hidden md:block md:col-span-1 h-full min-h-0">
+            <ActionLog />
+          </div>
         </div>
 
-        {/* Bottom Section: Hand */}
+        {/* Bottom Section: Hand / SpectatorView */}
         <div className="h-[25vh] md:h-1/3 min-h-[180px] md:min-h-[300px]">
-          <Hand />
+          {gameState.players.find(p => p.isMe)?.isEliminated ? (
+            <SpectatorView />
+          ) : (
+            <Hand />
+          )}
         </div>
 
         <CardAnimations />

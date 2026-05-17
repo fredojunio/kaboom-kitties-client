@@ -56,6 +56,7 @@ export interface GameState {
   discardPile: Card[];
   pendingAction: PendingAction | null;
   winnerId: string | null;
+  turnExpiresAt: number | null;
 }
 
 // Client-view state (sanitized so they don't see others' hands/draw pile exact)
@@ -88,6 +89,8 @@ export interface ClientGameState {
   activeKaboom: Card | null;
   pendingFavor: { attackerId: string, targetId: string, attackerName: string } | null;
   winnerId: string | null;
+  turnExpiresAt: number | null;
   myHand: Card[];
+  spectatorDeck?: Card[];
   actionLog: { message: string, timestamp: number }[];
 }
